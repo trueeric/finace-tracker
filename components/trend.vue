@@ -3,7 +3,7 @@
 		<div class="font-bold" :class="[color]">{{ title }}</div>
 		<div class="text-2xl fold-extrabold text-black dark:text-white mb-w">
 			<USkeleton class="h-8 w-full" v-if="loading" />
-			<div v-else>{{ amount }}</div>
+			<div v-else>{{ currency }}</div>
 		</div>
 
 		<div>
@@ -28,16 +28,7 @@ const props = defineProps({
 const trendingUp = computed(() => props.amount >= props.lastAmount)
 const icon = computed(() => (trendingUp.value ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'))
 
-// const percentageTrend = computed(() => {
-// 	if (props.amount === 0 || props.lastAmount === 0) return '0'
-
-// 	const bigger = Math.max(props.amount, props.lastAmount)
-// 	const lower = Math.min(props.amount, props.lastAmount)
-
-// 	const ratio = ((bigger - lower) / lower) * 100
-// 	console.log(bigger, lower, ratio, Math.ceil(ratio))
-// 	return ratio
-// })
+const { currency } = useCurrency(props.amount)
 
 const percentageTrend = computed(() => {
 	if (props.amount === 0 || props.lastAmount === 0) return '0'
@@ -45,7 +36,7 @@ const percentageTrend = computed(() => {
 	const difference = props.amount - props.lastAmount
 	const ratio = (difference / props.lastAmount) * 100
 	// console.log('ratio', Math.ceil(ratio))
-
+	// 取到小數點後1位
 	return `${Math.round(ratio * 10) / 10}%`
 })
 </script>
