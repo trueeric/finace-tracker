@@ -9,6 +9,12 @@
 		<Trend color="green" title="Investments" :amount="4000" :last-amount="2000" :loading="false" />
 		<Trend color="red" title="Saving" :amount="4000" :last-amount="4700" :loading="false" />
 	</section>
+	<section>
+		<Transaction />
+		<Transaction />
+		<Transaction />
+		<Transaction />
+	</section>
 </template>
 
 <script setup>
