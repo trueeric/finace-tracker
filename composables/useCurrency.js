@@ -9,5 +9,6 @@ export const useCurrency= (amount) => {
   return{
     currency
   }
+
 }
 
