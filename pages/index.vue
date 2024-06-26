@@ -33,7 +33,7 @@
 		</div>
 	</section>
 	<section v-else>
-		<Uskeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i" />
+		<USkeleton class="h-8 w-full mb-2" v-for="i in 4" :key="i" />
 	</section>
 </template>
 
