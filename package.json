@@ -1,21 +1,25 @@
 {
-  "name": "nuxt-app",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  },
-  "dependencies": {
-    "@nuxt/ui": "^2.17.0",
-    "@nuxtjs/supabase": "^1.2.2",
-    "nuxt": "^3.12.2",
-    "vue": "^3.4.29",
-    "vue-router": "^4.3.3",
-    "zod": "^3.23.8"
-  },
+	"name": "nuxt-app",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "nuxt build",
+		"dev": "nuxt dev",
+		"generate": "nuxt generate",
+		"preview": "nuxt preview",
+		"postinstall": "nuxt prepare",
+		"seed":"node seed.mjs"
+	},
+	"dependencies": {
+		"@nuxt/ui": "^2.17.0",
+		"@nuxtjs/supabase": "^1.2.2",
+		"nuxt": "^3.12.2",
+		"vue": "^3.4.29",
+		"vue-router": "^4.3.3",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@faker-js/faker": "^8.4.1"
+	},
   "packageManager": "pnpm@9.3.0+sha512.ee7b93e0c2bd11409c6424f92b866f31d3ea1bef5fbe47d3c7500cdc3c9668833d2e55681ad66df5b640c61fa9dc25d546efa54d76d7f8bf54b13614ac293631"
 }
