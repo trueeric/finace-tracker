@@ -3,7 +3,7 @@
 		<UCard>
 			<template #header> Add transaction </template>
 		</UCard>
-		<UForm :state="state">
+		<UForm :state="state" :schema="schema" ref="form" @submit="save">
 			<UFormGroup
 				label="Transaction Type"
 				:required="true"
@@ -22,7 +22,7 @@
 			<UFormGroup label="Description" hint="optional" name="description" class="mb-4">
 				<UInput placeholder="description" v-model="state.description" />
 			</UFormGroup>
-			<UFormGroup :required="true" label="Category" name="category" class="mb-4">
+			<UFormGroup :required="true" label="Category" name="category" class="mb-4" v-if="state.type === 'Expense'">
 				<USelect placeholder="category" :options="categories" v-model="state.category" />
 			</UFormGroup>
 			<UButton type="submit" color="black" variant="solid" label="save" block />
@@ -32,11 +32,48 @@
 
 <script setup>
 import { categories, types } from '~/constants'
+import { z } from 'zod'
+
 const props = defineProps({
 	modalValue: Boolean,
 })
 
 const emit = defineEmits('update:modelValue')
+
+const defaultSchema = z.object({
+	amount: z.number().positive('Amount needs to be more than 0!'),
+	created_at: z.string(),
+	description: z.string().optional(),
+})
+
+const incomeSchema = z.object({
+	type: z.literal('Income'),
+})
+
+// * 如果 type 為 expense, category為必填欄位
+const expenseSchema = z.object({
+	type: z.literal('Expense'),
+	category: z.enum(categories),
+})
+
+const investmentSchema = z.object({
+	type: z.literal('Investment'),
+})
+
+const savingSchema = z.object({
+	type: z.literal('Saving'),
+})
+// * 把incomeSchema, expenseSchma, investmentSchema, savingSchema都納入驗證規則
+const schema = z.intersection(
+	z.discriminatedUnion('type', [incomeSchema, expenseSchema, investmentSchema, savingSchema]),
+	defaultSchema
+)
+
+const form = ref()
+
+const save = async () => {
+	form.value.validate()
+}
 
 const state = ref({
 	type: undefined,
