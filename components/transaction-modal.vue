@@ -72,20 +72,34 @@ const schema = z.intersection(
 const form = ref()
 
 const save = async () => {
-	form.value.validate()
+	if (form.value.errors.length) return
+	// store into the supabase
+	// form.value.validate()
 }
 
-const state = ref({
+// * 新增表單預設值
+const initialState = {
 	type: undefined,
 	amount: 0,
 	created_at: undefined,
 	description: undefined,
 	category: undefined,
+}
+const state = ref({
+	...initialState,
 })
+
+const resetForm = () => {
+	Object.assign(state.value, initialState)
+	form.value.clear()
+}
 
 const isOpen = computed({
 	get: () => props.modelValue,
-	set: (value) => emit('update:modelValue', value),
+	set: (value) => {
+		if (!value) resetForm()
+		emit('update:modelValue', value)
+	},
 })
 </script>
 
