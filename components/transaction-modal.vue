@@ -17,7 +17,7 @@
 				<UInput type="number" placeholder="Amount" v-model.number="state.amount" />
 			</UFormGroup>
 			<UFormGroup label="Transaction date" :required="true" name="created_at" class="mb-4">
-				<UInput type="date" icon="i-heroicons-calendar-days-20-solid" v-model="state.date" />
+				<UInput type="date" icon="i-heroicons-calendar-days-20-solid" v-model="state.created_at" />
 			</UFormGroup>
 			<UFormGroup label="Description" hint="optional" name="description" class="mb-4">
 				<UInput placeholder="description" v-model="state.description" />
@@ -25,7 +25,7 @@
 			<UFormGroup :required="true" label="Category" name="category" class="mb-4" v-if="state.type === 'Expense'">
 				<USelect placeholder="category" :options="categories" v-model="state.category" />
 			</UFormGroup>
-			<UButton type="submit" color="black" variant="solid" label="save" block />
+			<UButton type="submit" color="black" variant="solid" label="save" block :loading="isLoading" />
 		</UForm>
 	</UModal>
 </template>
@@ -35,10 +35,10 @@ import { categories, types } from '~/constants'
 import { z } from 'zod'
 
 const props = defineProps({
-	modalValue: Boolean,
+	modelValue: Boolean,
 })
-
-const emit = defineEmits('update:modelValue')
+// ! defineEmits 需要用[]包起來
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const defaultSchema = z.object({
 	amount: z.number().positive('Amount needs to be more than 0!'),
@@ -70,11 +70,38 @@ const schema = z.intersection(
 )
 
 const form = ref()
+const isLoading = ref(false)
+const supabase = useSupabaseClient()
+const toast = useToast()
 
 const save = async () => {
 	if (form.value.errors.length) return
-	// store into the supabase
-	// form.value.validate()
+
+	isLoading.value = true
+	try {
+		// ! '...'spread的語法注意要用物件{}
+		const { error } = await supabase.from('transactions').upsert({ ...state.value })
+
+		if (!error) {
+			toast.add({
+				title: 'Transaction saved',
+				icon: 'i-i-heroicons-check-circle',
+				color: 'red',
+			})
+			isOpen.value = false
+			emit('saved')
+			return
+		}
+		throw error
+	} catch (e) {
+		toast.add({
+			title: 'Transaction NOT saved',
+			description: e.message,
+			icon: 'i-i-heroicons-exclamation-circle',
+		})
+	} finally {
+		isLoading.value = false
+	}
 }
 
 // * 新增表單預設值
@@ -102,5 +129,3 @@ const isOpen = computed({
 	},
 })
 </script>
-
-<style scoped></style>
