@@ -4,8 +4,8 @@
 		<USelectMenu :options="transactionViewOptions" v-model="selectedView" />
 	</section>
 	<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-		<Trend color="green" title="Income" :amount="incomeTotal" :last-amount="3000" :loading="pending" />
-		<Trend color="red" title="Expense" :amount="expenseTotal" :last-amount="5000" :loading="pending" />
+		<Trend color="green" title="Income" :amount="incomeTotal" :last-amount="prevIncomeTotal" :loading="pending" />
+		<Trend color="red" title="Expense" :amount="expenseTotal" :last-amount="prevExpenseTotal" :loading="pending" />
 		<Trend color="green" title="Investments" :amount="4000" :last-amount="2000" :loading="pending" />
 		<Trend color="red" title="Saving" :amount="4000" :last-amount="4700" :loading="pending" />
 	</section>
@@ -43,7 +43,7 @@ const selectedView = ref(transactionViewOptions[1])
 
 const isOpen = ref(false)
 
-const dates = useSelectedTimePeriod(selectedView)
+const { current, previous } = useSelectedTimePeriod(selectedView)
 
 const {
 	pending,
@@ -55,6 +55,12 @@ const {
 		expenseTotal,
 		grouped: { byDate },
 	},
-} = useFetchTransactions()
-await refresh()
+} = useFetchTransactions(current)
+const {
+	refresh: refreshPrevious,
+	transactions: { incomeTotal: prevIncomeTotal, expenseTotal: prevExpenseTotal },
+} = useFetchTransactions(previous)
+// await refresh() 移至 watch()處理
+// * 解決重覆呼叫  error 500 的問題? ss88
+await Promise.all([refresh(), refreshPrevious()])
 </script>
