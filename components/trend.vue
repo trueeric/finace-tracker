@@ -25,10 +25,12 @@ const props = defineProps({
 	loading: Boolean,
 })
 
+const { amount } = toRefs(props) //強制整理，讓computed()抓到新值來計算
+
 const trendingUp = computed(() => props.amount >= props.lastAmount)
 const icon = computed(() => (trendingUp.value ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'))
 
-const { currency } = useCurrency(props.amount)
+const { currency } = useCurrency(amount) //抓amount新值(by year, by month, by day)來計算
 
 const percentageTrend = computed(() => {
 	if (props.amount === 0 || props.lastAmount === 0) return '0'

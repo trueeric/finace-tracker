@@ -19,6 +19,7 @@ export const useFetchTransactions = (period) => {
 	const fetchTransactions = async () => {
 		pending.value = true
 		try {
+      // the key must be unique for each period to avoid conflicts in the cache, so we use the period dates
 			const { data } = await useAsyncData(`transactions-${period.value.from.toDateString()}-${period.value.to.toDateString()}`, async () => {
 				const { data, error } = await supabase
         .from('transactions')
@@ -40,7 +41,19 @@ export const useFetchTransactions = (period) => {
 
   const refresh = async () => (transactions.value = await fetchTransactions())
 
-  watch(period,async()=>await refresh(),{immediate:true})
+  // watch(period,async()=>await refresh())
+
+  // ! avoid recursive calls:
+  watch(period, async (previousValue, currentValue) => {
+    if (
+      previousValue.from.toISOString() === currentValue.from.toISOString() &&
+      previousValue.to.toISOString() === currentValue.to.toISOString()
+    ) {
+      return;
+    }
+
+    await refresh();
+  });
 
   const transactionsGroupedByDate = computed(() => {
     let grouped = {}
