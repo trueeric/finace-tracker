@@ -7,6 +7,17 @@
 	</header>
 </template>
 
-<script setup></script>
+<script setup>
+const user = useSupabaseUser()
+// console.log('User:', user)
 
-<style lang="scss" scoped></style>
+watch(
+	user,
+	(user) => {
+		if (user) {
+			console.log('loginUser:', user)
+		}
+	},
+	{ immediate: true }
+)
+</script>
