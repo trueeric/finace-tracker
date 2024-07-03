@@ -6,18 +6,3 @@
 		</div>
 	</header>
 </template>
-
-<script setup>
-const user = useSupabaseUser()
-// console.log('User:', user)
-
-watch(
-	user,
-	(user) => {
-		if (user) {
-			console.log('loginUser:', user)
-		}
-	},
-	{ immediate: true }
-)
-</script>
