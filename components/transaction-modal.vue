@@ -125,25 +125,23 @@ const save = async () => {
 }
 
 // * 新增表單預設值
-const initialState = {
-	type: undefined,
-	amount: 0,
-	created_at: undefined,
-	description: undefined,
-	category: undefined,
-}
+const initialState = isEditing.value
+	? {
+			type: props.transaction.type,
+			amount: props.transaction.amount,
+			created_at: props.transaction.created_at.split('T')[0],
+			description: props.transaction.description,
+			category: props.transaction.category,
+	  }
+	: {
+			type: undefined,
+			amount: 0,
+			created_at: undefined,
+			description: undefined,
+			category: undefined,
+	  }
 // * 編輯或新增
-const state = ref(
-	isEditing.value
-		? {
-				type: props.transaction.type,
-				amount: props.transaction.amount,
-				created_at: props.transaction.created_at.split('T')[0],
-				description: props.transaction.description,
-				category: props.transaction.category,
-		  }
-		: { ...initialState }
-)
+const state = ref({ ...initialState })
 
 const resetForm = () => {
 	Object.assign(state.value, initialState)
