@@ -57,7 +57,7 @@ const saveAvatar = async () => {
 	try {
 		uploading.value = true
 		// *  1. Grab the current avatar URL
-		const currentAvatarURL = user.value.user_metadata?.avatar_url
+		const currentAvatarUrl = user.value.user_metadata?.avatar_url
 
 		// *  2. Upload the image to avatars bucket
 		const { error } = await supabase.storage.from('avatars').upload(fileName, file)
@@ -71,6 +71,12 @@ const saveAvatar = async () => {
 		})
 
 		// *  4. (OPTIONALLY) remove the old avatar file
+		if (currentAvatarUrl) {
+			const { error } = await supabase.storage.from('avatars').remove([currentAvatarUrl])
+
+			if (error) throw error
+		}
+
 		// *  5. Reset the file input
 		fileInput.value.input.value = null
 
