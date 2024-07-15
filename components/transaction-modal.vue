@@ -1,7 +1,7 @@
 <template>
 	<UModal v-model="isOpen">
 		<UCard>
-			<template #header> Add transaction </template>
+			<template #header> {{ isEditing ? 'Edit' : 'Add' }} transaction </template>
 		</UCard>
 		<UForm :state="state" :schema="schema" ref="form" @submit="save">
 			<UFormGroup
@@ -11,7 +11,12 @@
 				placeholder="Select transaction type"
 				class="mb-4"
 			>
-				<USelect placeholder="type" :options="types" v-model="state.type" />
+				<USelect
+					:disabled="isEditing"
+					placeholder="Select the transaction type"
+					:options="types"
+					v-model="state.type"
+				/>
 			</UFormGroup>
 			<UFormGroup label="Amount" :required="true" name="amount" class="mb-4">
 				<UInput type="number" placeholder="Amount" v-model.number="state.amount" />
@@ -36,7 +41,18 @@ import { z } from 'zod'
 
 const props = defineProps({
 	modelValue: Boolean,
+	transaction: {
+		type: Object,
+		required: false,
+	},
 })
+
+/*  雙驚嘆號(!!)並不單純是在這樣用的，它是為了要轉換一些可以形成布林值的情況值，列出如下:
+false: 0, -0, null, false, NaN, undefined, ''(空白字串)
+true: 不是 false 的其他情況
+*/
+const isEditing = computed(() => !!props.transaction)
+
 // ! defineEmits 需要用[]包起來
 const emit = defineEmits(['update:modelValue', 'saved'])
 
@@ -81,7 +97,11 @@ const save = async () => {
 	isLoading.value = true
 	try {
 		// ! '...'spread的語法注意要用物件{}
-		const { error } = await supabase.from('transactions').upsert({ ...state.value })
+		// * upsert 有 insert 及 update的功能，要判斷有無id
+		const { error } = await supabase.from('transactions').upsert({
+			...state.value,
+			id: props.transaction?.id,
+		})
 
 		if (!error) {
 			toastSuccess({
@@ -112,9 +132,18 @@ const initialState = {
 	description: undefined,
 	category: undefined,
 }
-const state = ref({
-	...initialState,
-})
+// * 編輯或新增
+const state = ref(
+	isEditing.value
+		? {
+				type: props.transaction.type,
+				amount: props.transaction.amount,
+				created_at: props.transaction.created_at,
+				description: props.transaction.description,
+				category: props.transaction.category,
+		  }
+		: { ...initialState }
+)
 
 const resetForm = () => {
 	Object.assign(state.value, initialState)
